@@ -82,7 +82,7 @@ class CachedManifestProvider(object):
         self._distribution_cache = distribution_cache
         self._manifest_providers = manifest_providers
 
-    def __call__(self, dist_name, repo, pkg_name):
+    def __call__(self, dist_name, repo, pkg_name, credentials=None):
         assert repo.version
         package_xml = self._distribution_cache.release_package_xmls.get(pkg_name, None)
         if package_xml:
