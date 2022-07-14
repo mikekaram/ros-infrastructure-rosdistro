@@ -63,16 +63,17 @@ def bitbucket_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
         raise RuntimeError('Cannot handle non bitbucket url.')
 
     release_tag = repo.get_release_tag(pkg_name)
-
-    if not repo.has_remote_tag(release_tag):
-        raise RuntimeError('specified tag "%s" is not a git tag' % release_tag)
-
-    url = 'https://bitbucket.org/%s/raw/%s/package.xml' % (path, release_tag)
     if credentials:
         BITBUCKET_USER = os.getenv("GIT_USERNAME_%s" % (credentials.replace("-", "_")), None)
         BITBUCKET_PASSWORD = os.getenv("GIT_PASSWORD_%s" % (credentials.replace("-", "_")), None)
         if not BITBUCKET_USER and not BITBUCKET_PASSWORD:
             logger.error("Could not read credentials from env variables: %s" % (credentials))
+        # TODO check if repo has remote tag (with credentials)
+    else:
+        if not repo.has_remote_tag(release_tag):
+            raise RuntimeError('specified tag "%s" is not a git tag' % release_tag)
+
+    url = 'https://bitbucket.org/%s/raw/%s/package.xml' % (path, release_tag)
     try:
         logger.debug('Load package.xml file from url "%s"' % url)
         req = Request(url)
