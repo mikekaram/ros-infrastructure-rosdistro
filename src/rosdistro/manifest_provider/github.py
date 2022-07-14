@@ -53,7 +53,7 @@ GITHUB_PASSWORD = os.getenv('GITHUB_PASSWORD', None)
 def _get_url_contents(url):
     return urlopen(url).read().decode('utf-8')
 
-def github_manifest_provider(_dist_name, repo, pkg_name):
+def github_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
     assert repo.version
     server, path = repo.get_url_parts()
     if not server.endswith('github.com'):
@@ -66,6 +66,12 @@ def github_manifest_provider(_dist_name, repo, pkg_name):
         raise RuntimeError('specified tag "%s" is not a git tag' % release_tag)
 
     url = 'https://raw.githubusercontent.com/%s/%s/package.xml' % (path, release_tag)
+
+    if credentials:
+        GITHUB_USER = os.getenv("GIT_USER-%s" % (credentials), None)
+        GITHUB_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        if not GITHUB_USER and not GITHUB_PASSWORD:
+            logger.error("Could not read credentials from env variables: %s" % (credentials))
     try:
         logger.debug('Load package.xml file from url "%s"' % url)
         return _get_url_contents(url)

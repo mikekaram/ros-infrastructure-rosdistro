@@ -46,6 +46,7 @@ class Repository(object):
         self.release_repository = ReleaseRepositorySpecification(self.name, release_data) if release_data else None
         self.source_repository = SourceRepositorySpecification(self.name, source_data) if source_data else None
 
+        self.credentials = status_data.get('credentials', None)
         self.status = status_data.get('status', None)
         if self.status is not None:
             assert self.status in valid_statuses
@@ -76,6 +77,8 @@ class Repository(object):
 
         if self.status:
             data['status'] = self.status
+        if self.credentials:
+            data['credentials'] = self.credentials
         if self.status_description:
             data['status_description'] = self.status_description
 

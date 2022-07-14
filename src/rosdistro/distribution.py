@@ -74,7 +74,7 @@ class Distribution(object):
                 return None
             package_xml = None
             for mp in self._manifest_providers:
-                package_xml = mp(self._distribution_file.name, repo, pkg_name)
+                package_xml = mp(self._distribution_file.name, repo, pkg_name, credentials=self._distribution_file.repositories[repo_name].credentials)
                 if package_xml is not None:
                     break
             self._release_package_xmls[pkg_name] = package_xml

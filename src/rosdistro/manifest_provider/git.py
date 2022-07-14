@@ -44,11 +44,11 @@ from rosdistro.source_repository_cache import SourceRepositoryCache
 from rosdistro.vcs import Git, ref_is_hash
 
 
-def git_manifest_provider(_dist_name, repo, pkg_name):
+def git_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
     assert repo.version
     try:
         release_tag = repo.get_release_tag(pkg_name)
-        with _temp_git_clone(repo.url, release_tag) as git_repo_path:
+        with _temp_git_clone(repo.url, release_tag, credentials=credentials) as git_repo_path:
             filename = os.path.join(git_repo_path, 'package.xml')
             if not os.path.exists(filename):
                 raise RuntimeError('Could not find package.xml in repository "%s"' % repo.url)
@@ -84,9 +84,17 @@ def git_source_manifest_provider(repo):
 
 
 @contextmanager
-def _temp_git_clone(url, ref):
+def _temp_git_clone(url, ref, credentials=None):
     base = tempfile.mkdtemp('rosdistro')
     git = Git(cwd=base)
+    if credentials:
+        GIT_USER = os.getenv("GIT_USER-%s" % (credentials), None)
+        GIT_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        if not GIT_USER and not GIT_PASSWORD:
+            raise RuntimeError("Could not read credentials from env variables: %s" % (credentials))
+        result = git.command('config credential.helper \'!f() { sleep 1; echo "username=%s"; echo "password=%s"; }; f\'' % (GIT_USER, GIT_PASSWORD))
+        if result['returncode'] != 0:
+            raise RuntimeError('Could not save credential id "%s" to git config' % credentials)
     try:
         if git.version_gte('1.8.0') and not ref_is_hash(ref):
             # Directly clone the required ref with least amount of additional history.

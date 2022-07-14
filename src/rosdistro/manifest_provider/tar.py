@@ -52,12 +52,18 @@ from rosdistro import logger
 _TAR_USER = os.getenv('TAR_USER', None)
 _TAR_PASSWORD = os.getenv('TAR_PASSWORD', None)
 
-def tar_manifest_provider(_dist_name, repo, pkg_name):
+def tar_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
     assert repo.type == 'tar'
 
     subdir = repo.get_release_tag(pkg_name)
 
     request = Request(repo.url)
+
+    if credentials:
+        _TAR_USER = os.getenv("GIT_USER-%s" % (credentials), None)
+        _TAR_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        if not _TAR_USER and not _TAR_PASSWORD:
+           logger.debug("Could not read credentials from env variables: %s" % (credentials))
     if _TAR_USER and _TAR_PASSWORD:
         logger.debug('- using http basic auth from supplied environment variables.')
         credential_pair = '%s:%s' % (_TAR_USER, _TAR_PASSWORD)
