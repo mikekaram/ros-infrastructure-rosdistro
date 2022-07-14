@@ -60,8 +60,8 @@ def tar_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
     request = Request(repo.url)
 
     if credentials:
-        _TAR_USER = os.getenv("GIT_USER-%s" % (credentials), None)
-        _TAR_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        _TAR_USER = os.getenv("GIT_USERNAME_%s" % (credentials.replace("-", "_")), None)
+        _TAR_PASSWORD = os.getenv("GIT_PASSWORD_%s" % (credentials.replace("-", "_")), None)
         if not _TAR_USER and not _TAR_PASSWORD:
            logger.debug("Could not read credentials from env variables: %s" % (credentials))
     if _TAR_USER and _TAR_PASSWORD:

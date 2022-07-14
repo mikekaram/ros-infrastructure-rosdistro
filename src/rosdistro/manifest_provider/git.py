@@ -88,8 +88,8 @@ def _temp_git_clone(url, ref, credentials=None):
     base = tempfile.mkdtemp('rosdistro')
     git = Git(cwd=base)
     if credentials:
-        GIT_USER = os.getenv("GIT_USER-%s" % (credentials), None)
-        GIT_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        GIT_USER = os.getenv("GIT_USERNAME_%s" % (credentials.replace("-", "_")), None)
+        GIT_PASSWORD = os.getenv("GIT_PASSWORD_%s" % (credentials.replace("-", "_")), None)
         if not GIT_USER and not GIT_PASSWORD:
             raise RuntimeError("Could not read credentials from env variables: %s" % (credentials))
         result = git.command('config credential.helper \'!f() { sleep 1; echo "username=%s"; echo "password=%s"; }; f\'' % (GIT_USER, GIT_PASSWORD))

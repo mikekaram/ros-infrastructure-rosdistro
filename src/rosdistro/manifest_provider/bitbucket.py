@@ -69,8 +69,8 @@ def bitbucket_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
 
     url = 'https://bitbucket.org/%s/raw/%s/package.xml' % (path, release_tag)
     if credentials:
-        BITBUCKET_USER = os.getenv("GIT_USER-%s" % (credentials), None)
-        BITBUCKET_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        BITBUCKET_USER = os.getenv("GIT_USERNAME_%s" % (credentials.replace("-", "_")), None)
+        BITBUCKET_PASSWORD = os.getenv("GIT_PASSWORD_%s" % (credentials.replace("-", "_")), None)
         if not BITBUCKET_USER and not BITBUCKET_PASSWORD:
             logger.error("Could not read credentials from env variables: %s" % (credentials))
     try:

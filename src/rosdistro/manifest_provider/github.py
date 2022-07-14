@@ -68,8 +68,8 @@ def github_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
     url = 'https://raw.githubusercontent.com/%s/%s/package.xml' % (path, release_tag)
 
     if credentials:
-        GITHUB_USER = os.getenv("GIT_USER-%s" % (credentials), None)
-        GITHUB_PASSWORD = os.getenv("GIT_PASSWORD-%s" % (credentials), None)
+        GITHUB_USER = os.getenv("GIT_USERNAME_%s" % (credentials.replace("-", "_")), None)
+        GITHUB_PASSWORD = os.getenv("GIT_PASSWORD_%s" % (credentials.replace("-", "_")), None)
         if not GITHUB_USER and not GITHUB_PASSWORD:
             logger.error("Could not read credentials from env variables: %s" % (credentials))
     try:
