@@ -61,7 +61,6 @@ def bitbucket_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
         if not BITBUCKET_USER and not BITBUCKET_PASSWORD:
             logger.error("Could not read credentials from env variables: %s" % (credentials))
         # TODO check if repo has remote tag (with credentials)
-    logger.info(BITBUCKET_USER, BITBUCKET_PASSWORD)
     assert repo.version
     server, path = repo.get_url_parts()
 
