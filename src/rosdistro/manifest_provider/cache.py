@@ -93,7 +93,7 @@ class CachedManifestProvider(object):
             # use manifest providers to lazy load
             for mp in self._manifest_providers or []:
                 try:
-                    package_xml = sanitize_xml(mp(dist_name, repo, pkg_name))
+                    package_xml = sanitize_xml(mp(dist_name, repo, pkg_name, credentials=credentials))
                     break
                 except Exception as e:
                     # pass and try next manifest provider
