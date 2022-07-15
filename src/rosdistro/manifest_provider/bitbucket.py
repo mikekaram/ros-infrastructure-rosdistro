@@ -70,6 +70,7 @@ def bitbucket_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
             logger.error("Could not read credentials from env variables: %s" % (credentials))
         # TODO check if repo has remote tag (with credentials)
     else:
+        logger.info("Hello world")
         if not repo.has_remote_tag(release_tag):
             raise RuntimeError('specified tag "%s" is not a git tag' % release_tag)
 
