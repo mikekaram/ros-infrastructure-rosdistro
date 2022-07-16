@@ -40,6 +40,7 @@ except ImportError:
 
 import base64
 import os
+import json
 
 from rosdistro import logger
 
@@ -73,15 +74,23 @@ def bitbucket_manifest_provider(_dist_name, repo, pkg_name, credentials=None):
         if not repo.has_remote_tag(release_tag):
             raise RuntimeError('specified tag "%s" is not a git tag' % release_tag)
 
-    url = 'https://bitbucket.org/%s/raw/%s/package.xml' % (path, release_tag)
+    commits_url = 'https://api.bitbucket.org/2.0/repositories/%s/commits/%s' % (path, release_tag)
     try:
-        logger.debug('Load package.xml file from url "%s"' % url)
-        req = Request(url)
+        logger.debug('Load commits from url "%s"' % commits_url)
+        req = Request(commits_url)
         if BITBUCKET_USER and BITBUCKET_PASSWORD:
             logger.debug('- using http basic auth from supplied environment variables.')
             credential_pair = '%s:%s' % (BITBUCKET_USER, BITBUCKET_PASSWORD)
             authheader = 'Basic %s' % base64.b64encode(credential_pair.encode()).decode()
             req.add_header('Authorization', authheader)
+        appheader = 'application/json'
+        req.add_header('Accept', appheader)
+        commits = json.loads(urlopen(req).read().decode('utf-8'))
+        latest_commit_hash = commits["values"][0]["hash"]
+        file_url = 'https://api.bitbucket.org/2.0/repositories/%s/src/%s/package.xml' % (path, latest_commit_hash)
+        logger.debug('Load package.xml file from url "%s"' % file_url)
+        req = Request(file_url)
+        req.add_header('Authorization', authheader)
         package_xml = urlopen(req).read().decode('utf-8')
         return package_xml
     except URLError as e:
